@@ -62,30 +62,30 @@ cp -r $GOPATH/src/github.com/goomzee/cassandrabeat $GOPATH/src/github.com/elasti
 From the elastic/beats/cassandrabeat directory:
 
 1. Prepare and build python environment
-```bash
-cd /path/to/elastic/beats/cassandrabeat
-make python-env
-```
+   ```bash
+   cd /path/to/elastic/beats/cassandrabeat
+   make python-env
+   ```
 
 2. Activate python test environment
-```bash
-source build/python-env/bin/activate
-```
+   ```bash
+   source build/python-env/bin/activate
+   ```
 
 3. Build test-beat. Creates a `cassandrabeat.test` binary.
-```bash
-make buildbeat.test
-```
+   ```bash
+   make buildbeat.test
+   ```
 
 4. Go to tests/system
-```bash
-cd tests/system
-```
+   ```bash
+   cd tests/system
+   ```
 
 5. Run nosetests (`-x` = stop on first failure, `-v` = verbose)
-```bash
-nosetests --with-timer -v -x test_stats.py
-```
+   ```bash
+   nosetests --with-timer -v -x test_stats.py
+   ```
 
 ### Known issues
 The integration test is not functional at the moment. There are no
