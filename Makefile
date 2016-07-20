@@ -1,10 +1,8 @@
 
 BEATNAME=cassandrabeat
 BEAT_DIR=github.com/goomzee
+ES_BEATS=../../elastic/beats
 SYSTEM_TESTS=true
 
-# from goomzee directory
-#include ../../elastic/beats/libbeat/scripts/Makefile
+include ../../elastic/beats/libbeat/scripts/Makefile
 
-# from elastic/beats directory
-include ../libbeat/scripts/Makefile

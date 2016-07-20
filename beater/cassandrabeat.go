@@ -112,7 +112,7 @@ func (cb *Cassandrabeat) exportTableStats(table string) error {
 }
 
 func getLatency(table string) (read, write float64) {
-	cmdName := "./awkscript.sh"
+	cmdName := "awkscript.sh"
 	cmdArgs := []string{table}
 	cmdOut := exec.Command(cmdName, cmdArgs...).Output
 

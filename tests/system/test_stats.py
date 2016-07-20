@@ -23,7 +23,7 @@ class Test(TestCase):
         for key in [
             "table_name",
         ]:
-            assert type(output[key]) is str
+            assert type(output[key].encode('ascii','ignore')) is str
 
         for key in [
             "read_latency",

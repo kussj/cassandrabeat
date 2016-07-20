@@ -19,11 +19,9 @@ go install
 
 ## Run
 
-Note: you must be in the same directory as `awkscript.sh`
-
+To run the beat, execute the following command:
 ```bash
-cd $GOPATH/bin
-./cassandrabeat -c ../src/github.com/goomzee/cassandrabeat.yml
+cassandrabeat -c $GOPATH/src/github.com/goomzee/cassandrabeat.yml
 ```
 
 ## Exported fields
@@ -51,19 +49,10 @@ Table statistics:
 
 ## Testing
 
-Note: currently, testing is being done from the elastic/beats
-directory.
-
-Copy cassandrabeat to elastic/beats directory:
-```bash
-cp -r $GOPATH/src/github.com/goomzee/cassandrabeat $GOPATH/src/github.com/elastic/beats
-```
-
-From the elastic/beats/cassandrabeat directory:
+From $GOPATH/src/github.com/goomzee/cassandrabeat:
 
 1. Prepare and build python environment
    ```bash
-   cd /path/to/elastic/beats/cassandrabeat
    make python-env
    ```
 
@@ -87,14 +76,8 @@ From the elastic/beats/cassandrabeat directory:
    nosetests --with-timer -v -x test_stats.py
    ```
 
-### Known issues
-The integration test is not functional at the moment. There are no
-errors in the log file `cassandrabeat/build/system-tests/last_run/cassandrabeat.log`
-and the .yml file `cassandrabeat/build/system-tests/last_run/cassandrabeat.yml`
-is being generated correctly, but there is no output file being
-created and written to, which is causing the test to fail.
+6. Deactivate python environment
+   ```bash
+   deactivate
+   ```
 
-The reasoning behind running the tests from the elastic/beats
-directory is that there are errors when attempting to build the
-python environment from the goomzee directory, and this is a way
-to step around the issue.
