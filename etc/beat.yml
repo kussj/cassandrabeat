@@ -1,9 +1,12 @@
 ################### Cassandrabeat Configuration Example #########################
 
-############################# Input ############################################
-input:
-  # In seconds, defines how often to read table statistics
-  period: 10
-  # The name of the table we are getting the stats of
-  table: [""]
+############################# Cassandrabeat ######################################
 
+cassandrabeat:
+  # Defines how often an event is sent to the output
+  period: 10s
+
+  # The table(s) for which to get statistics
+  table:
+    - "system.local"
+    - "system.peers"

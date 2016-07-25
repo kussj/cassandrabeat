@@ -1,9 +1,9 @@
-################### Topbeat Configuration Example #########################
+################### Beat Configuration #########################
 
-############################# Input ############################################
 input:
+
   # In seconds, defines how often to read table statistics
-  period: {{ period | default(1) }}
+  period: {{ period | default(10) }}
 
     {% if table | length > 0 %}
   table:
@@ -14,6 +14,7 @@ input:
   table:
     - "system.local"
     {% endif %}
+
 
 ############################# Output ##########################################
 
@@ -51,7 +52,7 @@ shipper:
   # The name of the shipper that publishes the network data. It can be used to group
   # all the transactions sent by a single shipper in the web interface.
   # If this options is not defined, the hostname is used.
-  #name:
+  name: "cassandrabeat"
 
   # The tags of the shipper are included in their own field with each
   # transaction published. Tags make it easy to group servers by different
@@ -83,10 +84,10 @@ shipper:
 
   #files:
     # The directory where the log files will written to.
-    #path: /var/log/mybeat
+    #path: /var/log/cassandrabeat
 
     # The name of the files where the logs are written to.
-    #name: mybeat
+    #name: cassandrabeat
 
     # Configure log file size limit. If limit is reached, log file will be
     # automatically rotated

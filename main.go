@@ -1,15 +1,16 @@
 package main
 
 import (
-        cassandrabeat "github.com/bklise-goomzee/cassandrabeat/beater"
+	"os"
 
-        "github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/beat"
+
+	"github.com/goomzee/cassandrabeat/beater"
 )
 
-// You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
-var Version = ""
-var Name = "cassandrabeat"
-
 func main() {
-        beat.Run(Name, Version, cassandrabeat.New())
+	err := beat.Run("cassandrabeat", "", beater.New)
+	if err != nil {
+		os.Exit(1)
+	}
 }

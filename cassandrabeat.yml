@@ -1,9 +1,12 @@
-#==========================Cassandrabeat Configuration=========================
+################### Cassandrabeat Configuration Example #########################
 
-input:
-  # In seconds, defines how often to read table statistics
-  period: 10
+############################# Cassandrabeat ######################################
 
+cassandrabeat:
+  # Defines how often an event is sent to the output
+  period: 10s
+
+  # The table(s) for which to get statistics
   table:
     - "system.local"
     - "system.peers"
@@ -63,4 +66,3 @@ output.logstash:
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
 # "publish", "service".
 #logging.selectors: ["*"]
-

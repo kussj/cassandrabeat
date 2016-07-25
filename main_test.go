@@ -20,4 +20,3 @@ func TestSystem(t *testing.T) {
 		main()
 	}
 }
-

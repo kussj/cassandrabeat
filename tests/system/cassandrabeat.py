@@ -9,6 +9,18 @@ from datetime import datetime, timedelta
 
 build_path = "../../build/system-tests/"
 
+#import sys
+#sys.path.append('../../vendor/github.com/elastic/beats/libbeat/tests/system')
+#from beat.beat import TestCase
+#
+#class BaseTest(TestCase):
+#
+#    @classmethod
+#    def setUpClass(self):
+#        self.beat_name = "cassandrabeat"
+#        self.build_path = "../../build/system-tests/"
+#        self.beat_path = "../../cassandrabeat.test"
+
 class Proc(object):
     """
     Slim wrapper on subprocess.Popen that redirects 
@@ -126,7 +138,6 @@ class TestCase(unittest.TestCase):
         Waits until the cond function returns true, 
         or until the max_timeout is reached. Calls the cond
         function every poll_interval seconds.
-
         If the max_timeout is reached before cond() returns
         true, an exception is raised.
         """

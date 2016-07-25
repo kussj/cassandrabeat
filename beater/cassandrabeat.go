@@ -1,117 +1,69 @@
 package beater
 
 import (
+	"fmt"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
+
+	"github.com/goomzee/cassandrabeat/config"
 )
 
 type Cassandrabeat struct {
-	period		time.Duration
-	table		[]string
-	CbConfig	ConfigSettings
-	events		publisher.Client
+	done       chan struct{}
+	config     config.Config
+	client     publisher.Client
 
-	done		chan struct{}
+	table      []string
 }
 
-func New() *Cassandrabeat {
-	return &Cassandrabeat{}
-}
-
-func (cb *Cassandrabeat) Config(b *beat.Beat) error {
-	err := cfgfile.Read(&cb.CbConfig, "")
-	if err != nil {
-		logp.Err("Error reading configuration file: %v", err)
-		return err
+// Creates beater
+func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	config := config.DefaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	if cb.CbConfig.Input.Period != nil {
-		cb.period = time.Duration(*cb.CbConfig.Input.Period) * time.Second
-	} else {
-		cb.period = 10 * time.Second
+	bt := &Cassandrabeat{
+		done: make(chan struct{}),
+		config: config,
 	}
-
-	cb.table = cb.CbConfig.Input.Table[:]
-
-	logp.Debug("cassandrabeat", "Init cassandrabeat")
-	logp.Debug("cassandrabeat", "Period %v\n", cb.period)
-
-	return nil
+	return bt, nil
 }
 
-func (cb *Cassandrabeat) Setup(b *beat.Beat) error {
-	cb.events = b.Publisher.Connect()
-	cb.done = make(chan struct{})
-	return nil
-}
+func (bt *Cassandrabeat) Run(b *beat.Beat) error {
+	logp.Info("cassandrabeat is running! Hit CTRL-C to stop it.")
 
-func (cb *Cassandrabeat) Run(b *beat.Beat) error {
-	ticker := time.NewTicker(cb.period)
-	defer ticker.Stop()
-
-	var err error
-
+	bt.client = b.Publisher.Connect()
+	bt.table = bt.config.Table[:]
+	ticker := time.NewTicker(bt.config.Period)
 	for {
 		select {
-			case <-cb.done:
-				return nil
-			case <-ticker.C:
+		case <-bt.done:
+			return nil
+		case <-ticker.C:
 		}
 
-		timerStart := time.Now()
-
-		for _, table := range cb.table {
-			err = cb.exportTableStats(table)
-			if err != nil {
-				logp.Err("Error reading table stats: %v", err)
-				break
-			}
+		for _, table := range bt.table {
+			logp.Info("Getting latency for table: %s", table)
+			bt.getLatency(table)
 		}
-
-		timerEnd := time.Now()
-		duration := timerEnd.Sub(timerStart)
-		if duration.Nanoseconds() > cb.period.Nanoseconds() {
-			logp.Warn("Ignoring tick(s) due to processing taking longer than one period")
-		}
+		logp.Info("Event sent")
 	}
-
-	return err
 }
 
-func (cb *Cassandrabeat) Cleanup(b *beat.Beat) error {
-	return nil
+func (bt *Cassandrabeat) Stop() {
+	bt.client.Close()
+	close(bt.done)
 }
 
-func (cb *Cassandrabeat) Stop() {
-	close(cb.done)
-}
-
-func (cb *Cassandrabeat) exportTableStats(table string) error {
-	read_latency, write_latency := getLatency(table)
-
-	event := common.MapStr {
-		"@timestamp":		common.Time(time.Now()),
-		"type":			"stats",
-		"count":		1,
-		"table_name":		table,
-		"write_latency":	write_latency,
-		"read_latency" :	read_latency,
-	}
-
-	cb.events.PublishEvent(event)
-
-	return nil
-}
-
-func getLatency(table string) (read, write float64) {
+func (bt *Cassandrabeat) getLatency(table string) {
 	cmdName := "awkscript.sh"
 	cmdArgs := []string{table}
 	cmdOut := exec.Command(cmdName, cmdArgs...).Output
@@ -119,17 +71,26 @@ func getLatency(table string) (read, write float64) {
 	output, _ := cmdOut()
 	latency := strings.Split(string(output), "\n")
 
+	var read_latency, write_latency float64
 	if strings.Compare(latency[0], "NaN") == 0 {
-		read = 0.0
+		read_latency = 0.0
 	} else {
-		read, _ = strconv.ParseFloat(latency[0], 64)
+		read_latency, _ = strconv.ParseFloat(latency[0], 64)
 	}
 	if strings.Compare(latency[1], "NaN") == 0 {
-		write = 0.0
+		write_latency = 0.0
 	} else {
-		write, _ = strconv.ParseFloat(latency[1], 64)
+		write_latency, _ = strconv.ParseFloat(latency[1], 64)
 	}
 
-	return
-}
+	event := common.MapStr {
+		"@timestamp":	 common.Time(time.Now()),
+		"type":		 "stats",
+		"count":	 1,
+		"table_name":	 table,
+		"write_latency": write_latency,
+		"read_latency":	 read_latency,
+	}
 
+	bt.client.PublishEvent(event)
+}
