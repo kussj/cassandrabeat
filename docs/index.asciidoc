@@ -1,0 +1,5 @@
+= Cassandrabeat Docs
+
+Welcome to the Cassandrabeat documentation.
+
+
