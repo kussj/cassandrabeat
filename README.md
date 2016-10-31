@@ -1,6 +1,6 @@
 # Cassandrabeat
 
-Welcome to Cassandrabeat.
+Welcome to Cassandrabeat - Forked from the awesome: https://github.com/goomzee/cassandrabeat.
 
 Ensure that this folder is at the following location:
 `${GOPATH}/github.com/goomzee`
@@ -74,10 +74,16 @@ Table statistics:
     "@timestamp": "2016-07-12T16:28:19.670Z",
     "@version": "1",
     "type": "stats",
-    "count": 1,
-    "table_name": "system.local", 
-    "write_latency": 1.074, 
-    "read_latency": 3.343
+    "count": 1,                                                                                                                                                                                                 "number_of_keys": 0,                                                                                                                                                                                      
+    "pending_flushes": 0,                                                                                                                                                                                     
+    "read_latency": 2.368000,                                                                                                                                                                                 
+    "space_used_live": 0,                                                                                                                                                                                     
+    "space_used_snapshot_total": 0,                                                                                                                                                                           
+    "space_used_total": 0,                                                                                                                                                                                    
+    "sstable_count": 0,                                                                                                                                                                                       
+    "table_name": "system.peers",                                                                                                                                                                             
+    "type": "stats",                                                                                                                                                                                          
+    "write_latency": 0.019000
 }
 </pre>
 
